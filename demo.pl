@@ -1,53 +1,86 @@
-bot sub [cat, sem, list, agr, qo, lf, excont, incont, parts].
+
+bot sub [cat, sem, list, agr, logic, q_order, logic, logic_form, excont, incont, parts].
+
+    cat sub [cl_aggreeable, q_aggreeable] intro [agr:agr, q_order:q_order, logic_form:logic_form].
+        cl_aggreeable sub [cl, n] intro [agr:cl_agr].
+        q_aggreeable sub [np, vp, q, dou] intro [agr:q_agr].
+
+        q intro [q_type:q_type].
+            q_type sub [forall, exists].
+
+        dou intro [q_type:q_type].
+
+    agr sub [cl_agr, q_agr].
+        cl_agr sub [ge, ben].
+        q_agr sub [q_type].
+
+    sem sub [n_sem, v_sem].
+        n_sem sub [student, book].
+        v_sem sub [read].
+
+    list sub [e_list, ne_list].
+        ne_list intro [hd:bot, tl:list].
+
+    logic sub [sem_logic, q_logic].
+        sem_logic sub [v_logic, q_logic].
+            v_logic intro [verb:v_sem, subj:X, obj:Y].
+            n_logic intro [noun:n_sem, obj:Y].
+        q_logic intro [quant:q_type, var:X, first:sem_logic, second:sem_logic].
+
+    logic_form intro [excont, incont, parts].
+        excont sub [logic].
+        incont sub [sem_logic].
+        parts sub [list].
+
     
 % ====================== Lexical entries ======================
 
 % 每: the universal quantifier
-mei ---> (q, sem:(forall, Forall), qo:[Forall]).
+mei ---> (q, q_type:(forall, Forall), q_order:[Forall], lf:).
 
 % 一: the existential quantifier
-yi ---> (q, sem:(exists, Exists), qo:[Exists]).
+yi ---> (q, q_type:(exists, Exists), q_order:[Exists]).
 
 % 个: the classifier for students
-ge ---> (cl, agr:ge, qo:[]).
+ge ---> (cl, agr:ge, q_order:[]).
 
 % 本: the classifier for books
-ben ---> (cl, agr:ben, qo:[]).
+ben ---> (cl, agr:ben, q_order:[]).
 
 % 都: the distributive operator
-dou ---> (dou, sem:(forall, Forall), qo:[Forall]).
+dou ---> (dou, q_type:(forall, Forall), q_order:[Forall]).
 
 % 学生: student
-xuesheng ---> (n, sem:(student, Student), agr:ge, qo:[]).
+xuesheng ---> (n, sem:(student, Student), agr:ge, q_order:[]).
 
 % 书: book
-shu ---> (n, sem:(book, Book), agr:ben, qo:[]).
+shu ---> (n, sem:(book, Book), agr:ben, q_order:[]).
 
 % 读过: read
-duguo ---> (v, sem:(read, Read), qo:[]).
+duguo ---> (v, sem:(read, Read), q_order:[]).
 
 
 % =================== Phrase structure rules ===================
 
 clp rule
-    (clp, qo:[Q], agr:Agr, sem:Sem) ===>
-    sem_head> (cl, agr:Agr, qo:[Q]),
+    (clp, q_order:[Q], agr:Agr, sem:Sem) ===>
+    sem_head> (cl, agr:Agr, q_order:[Q]),
     cat> (n, sem:Sem, agr:Agr).
 
 np rule
-    (np, qo:[Q], sem:Sem) ===>
-    cat> (clp, qo:[Q]),
+    (np, q_order:[Q], sem:Sem) ===>
+    cat> (clp, q_order:[Q]),
     sem_head> (n, sem:Sem).
 
 vp rule
-    (vp, qo:[Q_np, Q_v], sem:Sem) ===>
-    sem_head> (v, sem:Sem, qo:[Q_v]),
-    cat> (np, qo:[Q_np]).
+    (vp, q_order:[Q_np, Q_v], sem:Sem) ===>
+    sem_head> (v, sem:Sem, q_order:[Q_v]),
+    cat> (np, q_order:[Q_np]).
 
 s rule
-    (s, qo:QO_s, sem:Sem) ===>
-    cat> (np, qo:QO_np),
-    sem_head> (vp, sem:Sem, qo:QO_vp),
+    (s, q_order:QO_s, sem:Sem) ===>
+    cat> (np, q_order:QO_np),
+    sem_head> (vp, sem:Sem, q_order:QO_vp),
     goal> concatenate(QO_np, QO_vp, QO_s).
 
 
